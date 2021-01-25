@@ -7,8 +7,6 @@ const Button = (props) => (
   </button>
 )
 
-const Statistic = ({ text, value }) => <div>{text} {value}</div>
-
 const Statistics = (props) => {
   if (props.good + props.bad + props.neutral === 0) {
     return (
@@ -20,11 +18,15 @@ const Statistics = (props) => {
 
   return (
     <div>
-      <Statistic text="good" value={props.good} />
-      <Statistic text="neutral" value={props.neutral} />
-      <Statistic text="bad" value={props.bad} />
-      <Statistic text="average" value={props.getAverage()} />
-      <Statistic text="positive" value={props.getPositive()} />
+      <table>
+        <tbody>
+          <tr><td>good</td><td>{props.good}</td></tr>
+          <tr><td>neutral</td><td>{props.neutral}</td></tr>
+          <tr><td>bad</td><td>{props.bad}</td></tr>
+          <tr><td>average</td><td>{props.getAverage()}</td></tr>
+          <tr><td>positive</td><td>{props.getPositive()}</td></tr>
+        </tbody>
+      </table>
     </div>
   )
 }
