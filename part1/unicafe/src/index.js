@@ -9,6 +9,27 @@ const Button = (props) => (
 
 const Display = ({ name, value }) => <div>{name} {value}</div>
 
+const Statistics = (props) => {
+  if (props.good + props.bad + props.neutral === 0) {
+    return (
+      <div>
+        No feedback given
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <Display name="good" value={props.good} />
+      <Display name="neutral" value={props.neutral} />
+      <Display name="bad" value={props.bad} />
+      <Display name="average" value={props.getAverage()} />
+      <Display name="positive" value={props.getPositive()} />
+    </div>
+  )
+}
+
+
 const App = () => {
   // save clicks of each button to own state
   const [good, setGood] = useState(0)
@@ -34,11 +55,7 @@ const App = () => {
       <Button handleClick={() => setNeutral(neutral + 1)} text="neutral" />
       <Button handleClick={() => setBad(bad + 1)} text="bad" />
       <h1>statistics</h1>
-      <Display name="good" value={good} />
-      <Display name="neutral" value={neutral} />
-      <Display name="bad" value={bad} />
-      <Display name="average" value={getAverage()} />
-      <Display name="positive" value={getPositive()} />
+      <Statistics good={good} bad={bad} neutral={neutral} getAverage={getAverage} getPositive={getPositive} />
     </div>
   )
 }
