@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const Filter = ({ newFilterName, handleFilterNameChange }) => {
@@ -26,6 +26,31 @@ const Country = ({ country }) => {
   )
 }
 
+const Weather = ({ country }) => {
+  const [weather, setWeather] = useState({})
+  const api_key = process.env.REACT_APP_API_KEY
+
+  // 异步用出了同步的感觉
+  useEffect(() => {
+    console.log('effect')
+    axios
+      .get('http://api.weatherstack.com/current', { params: { access_key: api_key, query: country.capital } })
+      .then(response => {
+        console.log('promise fulfilled')
+        setWeather(response.data.current)
+      })
+  }, [api_key, country.capital])
+
+  return (
+    <div>
+      <h3>Weather in {country.capital}</h3>
+      <div>temperature {weather.temperature} Celcius</div>
+      <div><img src={weather.weather_icons} alt="icons" width="90" height="120" /></div>
+      <div>wind {weather.wind_speed} mph direction {weather.wind_dir}</div>
+    </div>
+  )
+}
+
 const Detail = ({ country }) => {
   return (
     <div>
@@ -38,6 +63,7 @@ const Detail = ({ country }) => {
       <div>
         <img src={country.flag} alt="flag" width="90" height="120"></img>
       </div>
+      <Weather country={country} />
     </div>
   )
 }
@@ -64,6 +90,7 @@ const Countries = ({ countries }) => {
 const App = () => {
   const [newCountries, setNewCountries] = useState([])
   const [newFilterName, setNewFilterName] = useState('')
+
 
   const handleFilterNameChange = (event) => {
     if (event.target.value.length > 0) {
