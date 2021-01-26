@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 const Filter = ({ newFilterName, handleFilterNameChange }) => {
   return (
@@ -25,9 +25,24 @@ const PersonForm = ({ addPerson, newName, newNumber, handleNameChange, handleNum
   )
 }
 
-const Persons = ({ persons, newFilterName }) => {
-  return persons.filter(x => x.name.includes(newFilterName.toUpperCase()) || x.name.includes(newFilterName.toLowerCase())).map((person) =>
-    <div key={person.name}>{person.name} {person.number}</div>
+const Persons = (props) => {
+  const handleDelete = (event) => {
+    const personID = event.target.getAttribute("id")
+    console.log('personID is', personID)
+    const name = event.target.getAttribute("name")
+    if (window.confirm("Delete " + name + " ?")) {
+      personService.deleteByID(personID)
+        .then(response => {
+          console.log("delete succeed")
+          props.setPersons(props.persons.filter(x => x.name !== name).concat())
+          return
+        }
+        )
+    }
+  }
+
+  return props.persons.filter(x => x.name.includes(props.newFilterName.toUpperCase()) || x.name.includes(props.newFilterName.toLowerCase())).map((person) =>
+    <div key={person.name}>{person.name} {person.number}<button id={person.id} name={person.name} onClick={handleDelete}>delete</button></div >
   )
 
 }
@@ -41,16 +56,32 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     console.log(persons)
+    const newPerson = {
+      name: newName,
+      number: newNumber
+    }
     if (persons.every(currentValue => currentValue.name !== newName)) {
-      setPersons(persons.concat({
-        name: newName,
-        number: newNumber
-      }))
-      return
+      personService.create(newPerson)
+        .then(response => {
+          console.log("create succeed")
+          return
+        }
+        )
+    } else {
+      const old = persons.filter(x => x.name === newName)
+      personService.update(old[0].id, newPerson)
+        .then(response => {
+          console.log("create succeed")
+          return
+        }
+        )
     }
 
-    alert(`${newName} is already added to phonebook`)
-    return
+    personService.getAll()
+      .then(response => {
+        console.log('promise fulfilled')
+        setPersons(response.data)
+      })
   }
 
   const handleNameChange = (event) => {
@@ -68,8 +99,7 @@ const App = () => {
 
   useEffect(() => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
+    personService.getAll()
       .then(response => {
         console.log('promise fulfilled')
         setPersons(response.data)
@@ -84,7 +114,7 @@ const App = () => {
       <PersonForm addPerson={addPerson} newName={newName} newNumber={newNumber}
         handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
       <h3>Numbers</h3>
-      <Persons persons={persons} newFilterName={newFilterName} />
+      <Persons setPersons={setPersons} persons={persons} newFilterName={newFilterName} />
     </div>
   )
 }
