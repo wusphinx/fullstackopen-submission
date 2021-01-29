@@ -26,12 +26,12 @@ blogsRouter.delete('/:id', (request, response) => {
         })
 })
 
-blogsRouter.put('/:id', (request, response) => {
-    Blog.find({ _id: request.params.id })
-        .remove()
-        .then(result => {
-            response.status(201).json(result)
+blogsRouter.put('/:id/like', (request, response, next) => {
+    Blog.findByIdAndUpdate(request.params.id, { $inc: { likes: 1 } })
+        .then(updatedBlog => {
+            response.json(updatedBlog)
         })
+        .catch(error => next(error))
 })
 
 module.exports = blogsRouter
