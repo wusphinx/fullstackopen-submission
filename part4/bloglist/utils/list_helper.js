@@ -15,11 +15,18 @@ const favoriteBlog = blogs => {
     return m
 }
 
+const mostBlogs = blogs => {
+    // TODO
+}
+
+
+const idExist = blog => blog.id
 
 module.exports = {
     dummy,
     totalLikes,
-    favoriteBlog
+    favoriteBlog,
+    idExist
 }
 
 
